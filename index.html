@@ -13,26 +13,25 @@
       background: #f7f7f7;
     }
     button {
-      padding: 15px 25px;
-      font-size: 18px;
+      padding: 14px 22px;
+      font-size: 17px;
       border: none;
       border-radius: 10px;
       color: white;
       cursor: pointer;
-      margin: 8px;
+      margin: 6px;
     }
-    #travelBtn {
-      background: #2c7be5;
-    }
-    #backBtn {
-      background: #6c757d;
-      display: none;
-    }
+    .blue { background:#2c7be5; }
+    .gray { background:#6c757d; }
+    .green { background:#198754; }
+
     audio {
       width: 100%;
       max-width: 400px;
       margin-top: 15px;
     }
+    #backBtn { display:none; }
+    #lengthBox { margin-top:20px; }
   </style>
 </head>
 
@@ -42,29 +41,55 @@
 
   <audio id="player" controls autoplay></audio>
 
-  <br><br>
+  <div id="lengthBox" style="display:none;">
+    <p>⏱️ اختر طول الذكر:</p>
+    <button class="green" onclick="setLength('short')">قصير</button>
+    <button class="blue" onclick="setLength('medium')">متوسط</button>
+    <button class="gray" onclick="setLength('full')">كامل</button>
+  </div>
 
-  <button id="travelBtn" onclick="playTravel()">🚗 تشغيل دعاء السفر</button>
   <br>
-  <button id="backBtn" onclick="goBack()">↩️ رجوع للذكر</button>
+
+  <button class="blue" onclick="playTravel()">🚗 دعاء السفر</button>
+  <br>
+  <button id="backBtn" class="gray" onclick="goBack()">↩️ رجوع للذكر</button>
 
   <script>
     const hour = new Date().getHours();
     const player = document.getElementById("player");
     const title = document.getElementById("title");
     const backBtn = document.getElementById("backBtn");
+    const lengthBox = document.getElementById("lengthBox");
+
+    let length = localStorage.getItem("length");
+
+    function setLength(value) {
+      localStorage.setItem("length", value);
+      length = value;
+      lengthBox.style.display = "none";
+      playAuto();
+    }
 
     function playAuto() {
+      if (!length) {
+        title.innerText = "⏱️ اختر طول الذكر";
+        lengthBox.style.display = "block";
+        return;
+      }
+
+      let src = "";
       if (hour >= 4 && hour < 17) {
-        player.src = "morning.mp3";
+        src = `morning_${length}.mp3`;
         title.innerText = "🌅 أذكار الصباح";
         localStorage.setItem("lastMode", "morning");
       } else {
-        player.src = "evening.mp3";
+        src = `evening_${length}.mp3`;
         title.innerText = "🌙 أذكار المساء";
         localStorage.setItem("lastMode", "evening");
       }
+
       backBtn.style.display = "none";
+      player.src = src;
       player.play();
     }
 
@@ -76,18 +101,7 @@
     }
 
     function goBack() {
-      const last = localStorage.getItem("lastMode");
-
-      if (last === "morning") {
-        player.src = "morning.mp3";
-        title.innerText = "🌅 أذكار الصباح";
-      } else {
-        player.src = "evening.mp3";
-        title.innerText = "🌙 أذكار المساء";
-      }
-
-      backBtn.style.display = "none";
-      player.play();
+      playAuto();
     }
 
     playAuto();
