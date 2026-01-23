@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>أذكار</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body style="font-family:Arial; text-align:center; padding:30px; background:#f7f7f7">
+
+  <h2 id="title">🔊 جاري التشغيل...</h2>
+
+  <audio id="player" controls autoplay style="width:100%; max-width:400px;"></audio>
+
+  <br><br>
+
+  <button onclick="playTravel()"
+    style="padding:15px 25px; font-size:18px; border:none; border-radius:10px; background:#2c7be5; color:white;">
+    🚗 تشغيل دعاء السفر
+  </button>
+
+  <script>
+    const hour = new Date().getHours();
+    const player = document.getElementById("player");
+    const title = document.getElementById("title");
+
+    function playAuto() {
+      if (hour >= 4 && hour < 17) {
+        player.src = "morning.mp3";
+        title.innerText = "🌅 أذكار الصباح";
+      } else {
+        player.src = "evening.mp3";
+        title.innerText = "🌙 أذكار المساء";
+      }
+      player.play();
+    }
+
+    function playTravel() {
+      player.src = "travel.mp3";
+      title.innerText = "🚗 دعاء السفر";
+      player.play();
+    }
+
+    playAuto();
+  </script>
+
+</body>
+</html>
