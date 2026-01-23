@@ -5,6 +5,10 @@
   <title>أذكار</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2c7be5">
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -30,6 +34,7 @@
       max-width: 400px;
       margin-top: 15px;
     }
+
     #backBtn { display:none; }
     #lengthBox { margin-top:20px; }
   </style>
@@ -45,7 +50,6 @@
     <p>⏱️ اختر طول الذكر:</p>
     <button class="green" onclick="setLength('short')">قصير</button>
     <button class="blue" onclick="setLength('medium')">متوسط</button>
-    <button class="gray" onclick="setLength('full')">كامل</button>
   </div>
 
   <br>
@@ -105,6 +109,11 @@
     }
 
     playAuto();
+
+    // تسجيل Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
   </script>
 
 </body>
