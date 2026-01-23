@@ -1,62 +1,114 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>أذكار</title>
+  <title>رفيق</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Arabic Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 
   <!-- PWA -->
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#2c7be5">
+  <meta name="theme-color" content="#2C7BE5">
 
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Cairo', sans-serif;
+      background: #F7F7F7;
       text-align: center;
-      padding: 30px;
-      background: #f7f7f7;
+      padding: 24px;
+      margin: 0;
     }
-    button {
-      padding: 14px 22px;
-      font-size: 17px;
-      border: none;
-      border-radius: 10px;
-      color: white;
-      cursor: pointer;
-      margin: 6px;
+
+    .logo img {
+      width: 90px;
+      margin-bottom: 10px;
     }
-    .blue { background:#2c7be5; }
-    .gray { background:#6c757d; }
-    .green { background:#198754; }
+
+    .header {
+      background: white;
+      padding: 14px;
+      border-radius: 16px;
+      font-size: 22px;
+      font-weight: 700;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+      margin-bottom: 16px;
+    }
 
     audio {
       width: 100%;
-      max-width: 400px;
-      margin-top: 15px;
+      max-width: 420px;
+      margin: 16px auto;
     }
 
+    button {
+      width: 90%;
+      max-width: 420px;
+      padding: 14px;
+      margin: 6px 0;
+      border: none;
+      border-radius: 14px;
+      font-size: 17px;
+      font-weight: 600;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .primary { background:#2C7BE5; }
+    .secondary { background:#198754; }
+    .neutral { background:#6C757D; }
+
+    .icon {
+      width: 18px;
+      height: 18px;
+    }
+
+    #lengthBox { margin: 12px 0; }
     #backBtn { display:none; }
-    #lengthBox { margin-top:20px; }
+
+    .length-btns button {
+      width: 44%;
+      display: inline-block;
+    }
   </style>
 </head>
 
 <body>
 
-  <h2 id="title">🔊 جاري التشغيل...</h2>
-
-  <audio id="player" controls autoplay></audio>
-
-  <div id="lengthBox" style="display:none;">
-    <p>⏱️ اختر طول الذكر:</p>
-    <button class="green" onclick="setLength('short')">قصير</button>
-    <button class="blue" onclick="setLength('medium')">متوسط</button>
+  <!-- Logo -->
+  <div class="logo">
+    <img src="logo.png" alt="Rafeeq">
   </div>
 
-  <br>
+  <!-- Header -->
+  <div id="title" class="header">جاري التشغيل…</div>
 
-  <button class="blue" onclick="playTravel()">🚗 دعاء السفر</button>
-  <br>
-  <button id="backBtn" class="gray" onclick="goBack()">↩️ رجوع للذكر</button>
+  <!-- Player -->
+  <audio id="player" controls autoplay></audio>
+
+  <!-- Length Selection -->
+  <div id="lengthBox" style="display:none;">
+    <p>⏱️ اختر طول الذكر</p>
+    <div class="length-btns">
+      <button class="secondary" onclick="setLength('short')">قصير</button>
+      <button class="primary" onclick="setLength('medium')">متوسط</button>
+    </div>
+  </div>
+
+  <!-- Travel -->
+  <button class="primary" onclick="playTravel()">
+    <img src="car.svg" class="icon"> دعاء السفر
+  </button>
+
+  <!-- Back -->
+  <button id="backBtn" class="neutral" onclick="goBack()">
+    <img src="back.svg" class="icon"> رجوع للذكر
+  </button>
 
   <script>
     const hour = new Date().getHours();
@@ -67,16 +119,16 @@
 
     let length = localStorage.getItem("length");
 
-    function setLength(value) {
-      localStorage.setItem("length", value);
-      length = value;
+    function setLength(val) {
+      localStorage.setItem("length", val);
+      length = val;
       lengthBox.style.display = "none";
       playAuto();
     }
 
     function playAuto() {
       if (!length) {
-        title.innerText = "⏱️ اختر طول الذكر";
+        title.innerText = "اختر طول الذكر";
         lengthBox.style.display = "block";
         return;
       }
@@ -84,11 +136,11 @@
       let src = "";
       if (hour >= 4 && hour < 17) {
         src = `morning_${length}.mp3`;
-        title.innerText = "🌅 أذكار الصباح";
+        title.innerText = "أذكار الصباح";
         localStorage.setItem("lastMode", "morning");
       } else {
         src = `evening_${length}.mp3`;
-        title.innerText = "🌙 أذكار المساء";
+        title.innerText = "أذكار المساء";
         localStorage.setItem("lastMode", "evening");
       }
 
@@ -99,8 +151,8 @@
 
     function playTravel() {
       player.src = "travel.mp3";
-      title.innerText = "🚗 دعاء السفر";
-      backBtn.style.display = "inline-block";
+      title.innerText = "دعاء السفر";
+      backBtn.style.display = "flex";
       player.play();
     }
 
@@ -110,7 +162,6 @@
 
     playAuto();
 
-    // تسجيل Service Worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js');
     }
