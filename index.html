@@ -4,40 +4,89 @@
   <meta charset="UTF-8">
   <title>أذكار</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 30px;
+      background: #f7f7f7;
+    }
+    button {
+      padding: 15px 25px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      cursor: pointer;
+      margin: 8px;
+    }
+    #travelBtn {
+      background: #2c7be5;
+    }
+    #backBtn {
+      background: #6c757d;
+      display: none;
+    }
+    audio {
+      width: 100%;
+      max-width: 400px;
+      margin-top: 15px;
+    }
+  </style>
 </head>
 
-<body style="font-family:Arial; text-align:center; padding:30px; background:#f7f7f7">
+<body>
 
   <h2 id="title">🔊 جاري التشغيل...</h2>
 
-  <audio id="player" controls autoplay style="width:100%; max-width:400px;"></audio>
+  <audio id="player" controls autoplay></audio>
 
   <br><br>
 
-  <button onclick="playTravel()"
-    style="padding:15px 25px; font-size:18px; border:none; border-radius:10px; background:#2c7be5; color:white;">
-    🚗 تشغيل دعاء السفر
-  </button>
+  <button id="travelBtn" onclick="playTravel()">🚗 تشغيل دعاء السفر</button>
+  <br>
+  <button id="backBtn" onclick="goBack()">↩️ رجوع للذكر</button>
 
   <script>
     const hour = new Date().getHours();
     const player = document.getElementById("player");
     const title = document.getElementById("title");
+    const backBtn = document.getElementById("backBtn");
 
     function playAuto() {
       if (hour >= 4 && hour < 17) {
         player.src = "morning.mp3";
         title.innerText = "🌅 أذكار الصباح";
+        localStorage.setItem("lastMode", "morning");
       } else {
         player.src = "evening.mp3";
         title.innerText = "🌙 أذكار المساء";
+        localStorage.setItem("lastMode", "evening");
       }
+      backBtn.style.display = "none";
       player.play();
     }
 
     function playTravel() {
       player.src = "travel.mp3";
       title.innerText = "🚗 دعاء السفر";
+      backBtn.style.display = "inline-block";
+      player.play();
+    }
+
+    function goBack() {
+      const last = localStorage.getItem("lastMode");
+
+      if (last === "morning") {
+        player.src = "morning.mp3";
+        title.innerText = "🌅 أذكار الصباح";
+      } else {
+        player.src = "evening.mp3";
+        title.innerText = "🌙 أذكار المساء";
+      }
+
+      backBtn.style.display = "none";
       player.play();
     }
 
