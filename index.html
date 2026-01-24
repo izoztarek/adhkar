@@ -15,15 +15,30 @@
   <style>
     body {
       font-family: 'Cairo', sans-serif;
-      background: #F7F7F7;
-      text-align: center;
-      padding: 24px;
       margin: 0;
+      padding: 24px;
+      text-align: center;
+
+      /* 🔥 Background Image */
+      background-image: url('background.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
+
+    /* Overlay خفيف علشان النص يبان */
+    .overlay {
+      background: rgba(255,255,255,0.88);
+      border-radius: 24px;
+      padding: 20px;
+      max-width: 460px;
+      margin: auto;
     }
 
     .logo img {
-      width: 90px;
-      margin-bottom: 10px;
+      width: 100px;
+      margin-bottom: 12px;
     }
 
     .header {
@@ -43,7 +58,7 @@
     }
 
     button {
-      width: 90%;
+      width: 100%;
       max-width: 420px;
       padding: 14px;
       margin: 6px 0;
@@ -53,10 +68,11 @@
       font-weight: 600;
       color: white;
       cursor: pointer;
+
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 10px;
     }
 
     .primary { background:#2C7BE5; }
@@ -64,51 +80,63 @@
     .neutral { background:#6C757D; }
 
     .icon {
-      width: 18px;
-      height: 18px;
+      width: 24px;
+      height: 24px;
+    }
+
+    .icon.big {
+      width: 28px;
+      height: 28px;
     }
 
     #lengthBox { margin: 12px 0; }
     #backBtn { display:none; }
 
+    .length-btns {
+      display: flex;
+      gap: 10px;
+    }
+
     .length-btns button {
-      width: 44%;
-      display: inline-block;
+      width: 50%;
     }
   </style>
 </head>
 
 <body>
 
-  <!-- Logo -->
-  <div class="logo">
-    <img src="logo.png" alt="Rafeeq">
-  </div>
+  <div class="overlay">
 
-  <!-- Header -->
-  <div id="title" class="header">جاري التشغيل…</div>
-
-  <!-- Player -->
-  <audio id="player" controls autoplay></audio>
-
-  <!-- Length Selection -->
-  <div id="lengthBox" style="display:none;">
-    <p>⏱️ اختر طول الذكر</p>
-    <div class="length-btns">
-      <button class="secondary" onclick="setLength('short')">قصير</button>
-      <button class="primary" onclick="setLength('medium')">متوسط</button>
+    <!-- Logo -->
+    <div class="logo">
+      <img src="logo.png" alt="Rafeeq">
     </div>
+
+    <!-- Header -->
+    <div id="title" class="header">اختر طول الذكر</div>
+
+    <!-- Player -->
+    <audio id="player" controls autoplay></audio>
+
+    <!-- Length Selection -->
+    <div id="lengthBox">
+      <div class="length-btns">
+        <button class="secondary" onclick="setLength('short')">قصير</button>
+        <button class="primary" onclick="setLength('medium')">متوسط</button>
+      </div>
+    </div>
+
+    <!-- Travel -->
+    <button class="primary" onclick="playTravel()">
+      <img src="car.svg" class="icon big"> دعاء السفر
+    </button>
+
+    <!-- Back -->
+    <button id="backBtn" class="neutral" onclick="goBack()">
+      <img src="back.svg" class="icon"> رجوع للذكر
+    </button>
+
   </div>
-
-  <!-- Travel -->
-  <button class="primary" onclick="playTravel()">
-    <img src="car.svg" class="icon"> دعاء السفر
-  </button>
-
-  <!-- Back -->
-  <button id="backBtn" class="neutral" onclick="goBack()">
-    <img src="back.svg" class="icon"> رجوع للذكر
-  </button>
 
   <script>
     const hour = new Date().getHours();
@@ -122,14 +150,12 @@
     function setLength(val) {
       localStorage.setItem("length", val);
       length = val;
-      lengthBox.style.display = "none";
       playAuto();
     }
 
     function playAuto() {
       if (!length) {
         title.innerText = "اختر طول الذكر";
-        lengthBox.style.display = "block";
         return;
       }
 
