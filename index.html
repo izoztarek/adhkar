@@ -8,51 +8,44 @@
   <!-- Arabic Font -->
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <!-- PWA -->
-  <link rel="manifest" href="manifest.json">
-
   <style>
     body {
       font-family: 'Cairo', sans-serif;
       margin: 0;
-      padding: 0;
       background: #000;
     }
 
-    /* ========== WELCOME SCREEN ========== */
+    /* ================= WELCOME ================= */
     #welcome {
       position: fixed;
       inset: 0;
       background-image: url('welcome-bg.jpg');
       background-size: cover;
       background-position: center;
-      display: flex;
+      display: none;
       align-items: center;
       justify-content: center;
       z-index: 9999;
     }
 
-    .welcome-overlay {
-      background: rgba(0,0,0,0.65);
-      color: white;
-      text-align: center;
+    .welcome-box {
+      background: rgba(0,0,0,0.7);
+      color: #fff;
       padding: 24px;
-      border-radius: 20px;
+      border-radius: 22px;
       width: 90%;
       max-width: 420px;
+      text-align: center;
     }
 
-    .welcome-overlay h2 {
-      margin-top: 0;
-      font-size: 24px;
-    }
+    .welcome-box h2 { margin-top: 0; }
 
-    .welcome-overlay p {
+    .welcome-box p {
       font-size: 16px;
       line-height: 1.6;
     }
 
-    .welcome-overlay input {
+    .welcome-box input {
       width: 100%;
       padding: 12px;
       margin: 6px 0;
@@ -61,7 +54,7 @@
       font-size: 16px;
     }
 
-    .welcome-overlay button {
+    .welcome-box button {
       width: 100%;
       padding: 12px;
       margin-top: 8px;
@@ -75,20 +68,64 @@
     .btn-primary { background:#2C7BE5; color:white; }
     .btn-secondary { background:#6c757d; color:white; }
 
-    /* ========== MAIN APP ========== */
+    /* ================= APP ================= */
     #app {
       display: none;
       padding: 20px;
       text-align: center;
+      background: #F7F7F7;
+      min-height: 100vh;
     }
+
+    .logo img {
+      width: 90px;
+      margin-bottom: 10px;
+    }
+
+    .header {
+      background: white;
+      padding: 14px;
+      border-radius: 16px;
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    }
+
+    audio {
+      width: 100%;
+      max-width: 420px;
+      margin: 14px auto;
+    }
+
+    button.app-btn {
+      width: 100%;
+      max-width: 420px;
+      padding: 14px;
+      margin: 6px auto;
+      border: none;
+      border-radius: 14px;
+      font-size: 17px;
+      font-weight: 600;
+      color: white;
+      cursor: pointer;
+    }
+
+    .primary { background:#2C7BE5; }
+    .secondary { background:#198754; }
+    .neutral { background:#6C757D; }
+
+    #lengthBox { margin: 12px 0; }
+    #backBtn { display:none; }
   </style>
 </head>
 
 <body>
 
-<!-- WELCOME SCREEN -->
+<!-- ================= WELCOME SCREEN ================= -->
 <div id="welcome">
-  <div class="welcome-overlay" id="welcomeStep1">
+
+  <div class="welcome-box" id="step1">
     <h2>👋 أهلاً بيك في رفيق</h2>
     <p>
       رفيق بيساعدك تفتكر الذكر من غير ما تفتكر<br>
@@ -98,68 +135,124 @@
     <button class="btn-secondary" onclick="skipWelcome()">تخطي</button>
   </div>
 
-  <div class="welcome-overlay" id="welcomeStep2" style="display:none;">
-    <h2>🎁 كود خصم ليك</h2>
-    <input type="text" id="name" placeholder="اسمك">
-    <input type="tel" id="phone" placeholder="رقم الموبايل">
+  <div class="welcome-box" id="step2" style="display:none;">
+    <h2>🎁 استلم كود الخصم</h2>
+    <input id="name" placeholder="اسمك">
+    <input id="phone" placeholder="رقم الموبايل">
     <button class="btn-primary" onclick="submitForm()">استلم الكود</button>
   </div>
 
-  <div class="welcome-overlay" id="welcomeStep3" style="display:none;">
+  <div class="welcome-box" id="step3" style="display:none;">
     <h2>🎉 مبروك!</h2>
     <p>كود الخصم بتاعك:</p>
     <h3>RAFEEQ10</h3>
     <button class="btn-primary" onclick="finishWelcome()">ابدأ الاستخدام</button>
   </div>
+
 </div>
 
-<!-- MAIN APP PLACEHOLDER -->
+<!-- ================= APP ================= -->
 <div id="app">
-  <!-- هنا بيكمّل كود الأذكار بتاعك زي ما هو -->
+
+  <div class="logo">
+    <img src="logo.png">
+  </div>
+
+  <div id="title" class="header">اختر طول الذكر</div>
+
+  <audio id="player" controls autoplay></audio>
+
+  <div id="lengthBox">
+    <button class="app-btn secondary" onclick="setLength('short')">قصير</button>
+    <button class="app-btn primary" onclick="setLength('medium')">متوسط</button>
+  </div>
+
+  <button class="app-btn primary" onclick="playTravel()">🚗 دعاء السفر</button>
+  <button id="backBtn" class="app-btn neutral" onclick="goBack()">↩️ رجوع</button>
+
 </div>
 
 <script>
-  const welcomed = localStorage.getItem("welcomed");
-
-  if (!welcomed) {
+  /* ===== Welcome Logic ===== */
+  if (!localStorage.getItem("welcomed")) {
     document.getElementById("welcome").style.display = "flex";
   } else {
-    document.getElementById("welcome").style.display = "none";
     document.getElementById("app").style.display = "block";
   }
 
   function showForm() {
-    document.getElementById("welcomeStep1").style.display = "none";
-    document.getElementById("welcomeStep2").style.display = "block";
+    step1.style.display = "none";
+    step2.style.display = "block";
   }
 
   function skipWelcome() {
     localStorage.setItem("welcomed", "true");
-    document.getElementById("welcome").style.display = "none";
-    document.getElementById("app").style.display = "block";
+    welcome.style.display = "none";
+    app.style.display = "block";
   }
 
   function submitForm() {
-    const name = document.getElementById("name").value;
-    const phone = document.getElementById("phone").value;
-
-    if (!name || !phone) {
-      alert("من فضلك اكتب الاسم ورقم الموبايل");
+    if (!name.value || !phone.value) {
+      alert("اكتب الاسم ورقم الموبايل");
       return;
     }
-
-    // ⚠️ هنا بعدين نربط Google Form أو API
-    console.log("Name:", name, "Phone:", phone);
-
-    document.getElementById("welcomeStep2").style.display = "none";
-    document.getElementById("welcomeStep3").style.display = "block";
+    step2.style.display = "none";
+    step3.style.display = "block";
   }
 
   function finishWelcome() {
     localStorage.setItem("welcomed", "true");
-    document.getElementById("welcome").style.display = "none";
-    document.getElementById("app").style.display = "block";
+    welcome.style.display = "none";
+    app.style.display = "block";
+    window.scrollTo(0,0);
   }
+
+  /* ===== Adhkar Logic ===== */
+  const hour = new Date().getHours();
+  const player = document.getElementById("player");
+  const title = document.getElementById("title");
+  const backBtn = document.getElementById("backBtn");
+
+  let length = localStorage.getItem("length");
+
+  function setLength(val) {
+    localStorage.setItem("length", val);
+    length = val;
+    playAuto();
+  }
+
+  function playAuto() {
+    if (!length) {
+      title.innerText = "اختر طول الذكر";
+      return;
+    }
+
+    let src;
+    if (hour >= 4 && hour < 17) {
+      src = `morning_${length}.mp3`;
+      title.innerText = "أذكار الصباح";
+    } else {
+      src = `evening_${length}.mp3`;
+      title.innerText = "أذكار المساء";
+    }
+
+    backBtn.style.display = "none";
+    player.src = src;
+    player.play();
+  }
+
+  function playTravel() {
+    player.src = "travel.mp3";
+    title.innerText = "دعاء السفر";
+    backBtn.style.display = "block";
+    player.play();
+  }
+
+  function goBack() {
+    playAuto();
+  }
+
+  playAuto();
 </script>
 
 </body>
