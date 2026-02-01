@@ -1,153 +1,157 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <title>رفيق</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<title>رفيق</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- Arabic Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <style>
-    body {
-      font-family: 'Cairo', sans-serif;
-      margin: 0;
-      background: #000;
-    }
+<style>
+*{box-sizing:border-box}
 
-    /* ============ WELCOME ============ */
-    #welcome {
-      position: fixed;
-      inset: 0;
-      background: url('welcome-bg.jpg') center/cover no-repeat;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-    }
+body{
+  margin:0;
+  font-family:'Cairo',sans-serif;
+}
 
-    .welcome-box {
-      background: rgba(0,0,0,0.72);
-      color: #fff;
-      padding: 24px;
-      border-radius: 22px;
-      width: 90%;
-      max-width: 420px;
-      text-align: center;
-    }
+/* ========== WELCOME ========== */
+#welcome{
+  position:fixed;
+  inset:0;
+  background:url('welcome-bg.jpg') center/cover no-repeat;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
 
-    .welcome-box h2 { margin-top: 0; }
+.welcome-box{
+  background:rgba(0,0,0,.75);
+  color:#fff;
+  padding:24px;
+  border-radius:22px;
+  width:90%;
+  max-width:420px;
+  text-align:center;
+  transition:.3s;
+}
 
-    .welcome-box p {
-      font-size: 16px;
-      line-height: 1.6;
-    }
+.hidden{
+  opacity:0;
+  pointer-events:none;
+  position:absolute;
+}
 
-    .welcome-box input {
-      width: 100%;
-      padding: 12px;
-      margin: 6px 0;
-      border-radius: 10px;
-      border: none;
-      font-size: 16px;
-    }
+.welcome-box input{
+  width:100%;
+  padding:12px;
+  margin:6px 0;
+  border-radius:10px;
+  border:none;
+  font-size:16px;
+}
 
-    .welcome-box button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 8px;
-      border-radius: 12px;
-      border: none;
-      font-size: 17px;
-      font-weight: 600;
-      cursor: pointer;
-    }
+.welcome-box button{
+  width:100%;
+  padding:12px;
+  margin-top:8px;
+  border:none;
+  border-radius:12px;
+  font-size:17px;
+  font-weight:600;
+  cursor:pointer;
+}
 
-    .btn-primary { background:#2C7BE5; color:white; }
-    .btn-secondary { background:#6c757d; color:white; }
+.btn-primary{background:#2C7BE5;color:#fff}
+.btn-secondary{background:#6c757d;color:#fff}
 
-    .error {
-      color: #ffb3b3;
-      font-size: 14px;
-      margin-top: 6px;
-      display: none;
-    }
+.error{
+  font-size:14px;
+  color:#ffb3b3;
+  display:none;
+}
 
-    /* ============ APP ============ */
-    #app {
-      display: none;
-      padding: 20px;
-      text-align: center;
-      background: #F7F7F7;
-      min-height: 100vh;
-    }
+/* ========== APP ========== */
+#app{
+  display:none;
+  min-height:100vh;
+  background:url('bg.jpg') center/cover fixed no-repeat;
+  padding:20px;
+  text-align:center;
+}
 
-    .logo img {
-      width: 90px;
-      margin-bottom: 10px;
-    }
+.top-bar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
 
-    .header {
-      background: white;
-      padding: 14px;
-      border-radius: 16px;
-      font-size: 22px;
-      font-weight: 700;
-      margin-bottom: 14px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-    }
+.logo img{width:90px}
 
-    audio {
-      width: 100%;
-      max-width: 420px;
-      margin: 14px auto;
-    }
+.settings{
+  font-size:22px;
+  cursor:pointer;
+}
 
-    button.app-btn {
-      width: 100%;
-      max-width: 420px;
-      padding: 14px;
-      margin: 6px auto;
-      border: none;
-      border-radius: 14px;
-      font-size: 17px;
-      font-weight: 600;
-      color: white;
-      cursor: pointer;
-    }
+.header{
+  background:rgba(255,255,255,.9);
+  padding:14px;
+  border-radius:16px;
+  font-size:22px;
+  font-weight:700;
+  margin:14px 0;
+}
 
-    .primary { background:#2C7BE5; }
-    .secondary { background:#198754; }
-    .neutral { background:#6C757D; }
+audio{
+  width:100%;
+  max-width:420px;
+  margin:12px auto;
+}
 
-    #backBtn { display:none; }
-  </style>
+.app-btn{
+  width:100%;
+  max-width:420px;
+  padding:14px;
+  margin:6px auto;
+  border:none;
+  border-radius:14px;
+  font-size:17px;
+  font-weight:600;
+  color:#fff;
+  cursor:pointer;
+}
+
+.primary{background:#2C7BE5}
+.secondary{background:#198754}
+.neutral{background:#6C757D}
+
+#lengthBox{display:none}
+#backBtn{display:none}
+</style>
 </head>
 
 <body>
 
-<!-- ============ WELCOME SCREEN ============ -->
+<!-- ========== WELCOME ========= -->
 <div id="welcome">
 
   <div class="welcome-box" id="step1">
     <h2>👋 أهلاً بيك في رفيق</h2>
-    <p>
-      رفيق بيساعدك تفتكر الذكر من غير ما تفتكر<br>
-      قرّب موبايلك… والذكر يشتغل تلقائيًا
-    </p>
+    <p>قرّب موبايلك… الذكر يشتغل تلقائيًا</p>
     <button class="btn-primary" onclick="showForm()">🎁 خد خصم 10%</button>
     <button class="btn-secondary" onclick="skipWelcome()">تخطي</button>
   </div>
 
-  <div class="welcome-box" id="step2" style="display:none;">
+  <div class="welcome-box hidden" id="step2">
     <h2>🎁 استلم كود الخصم</h2>
     <input id="name" placeholder="اسمك">
     <input id="phone" placeholder="رقم الموبايل">
-    <div class="error" id="formError"></div>
+    <div id="formError" class="error"></div>
     <button class="btn-primary" onclick="submitForm()">استلم الكود</button>
   </div>
 
-  <div class="welcome-box" id="step3" style="display:none;">
+  <div class="welcome-box hidden" id="step3">
     <h2>🎉 مبروك!</h2>
     <p>كود الخصم بتاعك:</p>
     <h3>RAFEEQ10</h3>
@@ -156,19 +160,22 @@
 
 </div>
 
-<!-- ============ APP ============ -->
+<!-- ========== APP ========= -->
 <div id="app">
 
-  <div class="logo">
-    <img src="logo.png">
+  <div class="top-bar">
+    <div class="logo"><img src="logo.png"></div>
+    <div class="settings" onclick="toggleSettings()">⚙️</div>
   </div>
 
   <div id="title" class="header">اختر طول الذكر</div>
 
   <audio id="player" controls autoplay></audio>
 
-  <button class="app-btn secondary" onclick="setLength('short')">قصير</button>
-  <button class="app-btn primary" onclick="setLength('medium')">متوسط</button>
+  <div id="lengthBox">
+    <button class="app-btn secondary" onclick="setLength('short')">قصير</button>
+    <button class="app-btn primary" onclick="setLength('medium')">متوسط</button>
+  </div>
 
   <button class="app-btn primary" onclick="playTravel()">🚗 دعاء السفر</button>
   <button id="backBtn" class="app-btn neutral" onclick="goBack()">↩️ رجوع</button>
@@ -176,103 +183,96 @@
 </div>
 
 <script>
-  /* ===== Welcome Logic ===== */
-  if (!localStorage.getItem("welcomed")) {
-    welcome.style.display = "flex";
-  } else {
-    app.style.display = "block";
+/* ===== START ===== */
+if(localStorage.getItem("welcomed")){
+  welcome.style.display="none";
+  app.style.display="block";
+}
+
+/* ===== WELCOME ===== */
+function showForm(){
+  step1.classList.add("hidden");
+  step2.classList.remove("hidden");
+}
+
+function skipWelcome(){
+  localStorage.setItem("welcomed","true");
+  welcome.style.display="none";
+  app.style.display="block";
+}
+
+function submitForm(){
+  const n=name.value.trim();
+  const p=phone.value.trim();
+  formError.style.display="none";
+
+  if(n.length<2){
+    formError.innerText="اكتب اسم صحيح";
+    formError.style.display="block";
+    return;
   }
 
-  function showForm() {
-    step1.style.display = "none";
-    step2.style.display = "block";
+  if(!/^01[0-2,5][0-9]{8}$/.test(p)){
+    formError.innerText="رقم موبايل غير صحيح";
+    formError.style.display="block";
+    return;
   }
 
-  function skipWelcome() {
-    localStorage.setItem("welcomed", "true");
-    welcome.style.display = "none";
-    app.style.display = "block";
-  }
+  step2.classList.add("hidden");
+  step3.classList.remove("hidden");
+}
 
-  function submitForm() {
-    const nameVal = name.value.trim();
-    const phoneVal = phone.value.trim();
-    const errorBox = document.getElementById("formError");
+function finishWelcome(){
+  localStorage.setItem("welcomed","true");
+  welcome.style.display="none";
+  app.style.display="block";
+}
 
-    errorBox.style.display = "none";
+/* ===== ADHKAR ===== */
+const hour=new Date().getHours();
+const player=document.getElementById("player");
+const title=document.getElementById("title");
+const backBtn=document.getElementById("backBtn");
+let length=localStorage.getItem("length");
 
-    if (nameVal.length < 2) {
-      errorBox.innerText = "من فضلك اكتب اسم صحيح";
-      errorBox.style.display = "block";
-      return;
-    }
+function toggleSettings(){
+  lengthBox.style.display=lengthBox.style.display==="block"?"none":"block";
+}
 
-    const phoneRegex = /^01[0-2,5][0-9]{8}$/;
-    if (!phoneRegex.test(phoneVal)) {
-      errorBox.innerText = "من فضلك اكتب رقم موبايل مصري صحيح";
-      errorBox.style.display = "block";
-      return;
-    }
-
-    console.log("Name:", nameVal, "Phone:", phoneVal);
-
-    step2.style.display = "none";
-    step3.style.display = "block";
-  }
-
-  function finishWelcome() {
-    localStorage.setItem("welcomed", "true");
-    welcome.style.display = "none";
-    app.style.display = "block";
-    window.scrollTo(0,0);
-  }
-
-  /* ===== Adhkar Logic ===== */
-  const hour = new Date().getHours();
-  const player = document.getElementById("player");
-  const title = document.getElementById("title");
-  const backBtn = document.getElementById("backBtn");
-
-  let length = localStorage.getItem("length");
-
-  function setLength(val) {
-    localStorage.setItem("length", val);
-    length = val;
-    playAuto();
-  }
-
-  function playAuto() {
-    if (!length) {
-      title.innerText = "اختر طول الذكر";
-      return;
-    }
-
-    let src;
-    if (hour >= 4 && hour < 17) {
-      src = `morning_${length}.mp3`;
-      title.innerText = "أذكار الصباح";
-    } else {
-      src = `evening_${length}.mp3`;
-      title.innerText = "أذكار المساء";
-    }
-
-    backBtn.style.display = "none";
-    player.src = src;
-    player.play();
-  }
-
-  function playTravel() {
-    player.src = "travel.mp3";
-    title.innerText = "دعاء السفر";
-    backBtn.style.display = "block";
-    player.play();
-  }
-
-  function goBack() {
-    playAuto();
-  }
-
+function setLength(l){
+  localStorage.setItem("length",l);
+  length=l;
   playAuto();
+}
+
+function playAuto(){
+  if(!length){
+    lengthBox.style.display="block";
+    return;
+  }
+  let src="";
+  if(hour>=4&&hour<17){
+    src=`morning_${length}.mp3`;
+    title.innerText="أذكار الصباح";
+  }else{
+    src=`evening_${length}.mp3`;
+    title.innerText="أذكار المساء";
+  }
+  backBtn.style.display="none";
+  player.src=src;
+  player.play();
+}
+
+function playTravel(){
+  player.src="travel.mp3";
+  title.innerText="دعاء السفر";
+  backBtn.style.display="block";
+  player.play();
+}
+
+function goBack(){playAuto()}
+
+playAuto();
 </script>
 
 </body>
