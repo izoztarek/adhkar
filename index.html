@@ -15,13 +15,11 @@
       background: #000;
     }
 
-    /* ================= WELCOME ================= */
+    /* ============ WELCOME ============ */
     #welcome {
       position: fixed;
       inset: 0;
-      background-image: url('welcome-bg.jpg');
-      background-size: cover;
-      background-position: center;
+      background: url('welcome-bg.jpg') center/cover no-repeat;
       display: none;
       align-items: center;
       justify-content: center;
@@ -29,7 +27,7 @@
     }
 
     .welcome-box {
-      background: rgba(0,0,0,0.7);
+      background: rgba(0,0,0,0.72);
       color: #fff;
       padding: 24px;
       border-radius: 22px;
@@ -68,7 +66,14 @@
     .btn-primary { background:#2C7BE5; color:white; }
     .btn-secondary { background:#6c757d; color:white; }
 
-    /* ================= APP ================= */
+    .error {
+      color: #ffb3b3;
+      font-size: 14px;
+      margin-top: 6px;
+      display: none;
+    }
+
+    /* ============ APP ============ */
     #app {
       display: none;
       padding: 20px;
@@ -115,14 +120,13 @@
     .secondary { background:#198754; }
     .neutral { background:#6C757D; }
 
-    #lengthBox { margin: 12px 0; }
     #backBtn { display:none; }
   </style>
 </head>
 
 <body>
 
-<!-- ================= WELCOME SCREEN ================= -->
+<!-- ============ WELCOME SCREEN ============ -->
 <div id="welcome">
 
   <div class="welcome-box" id="step1">
@@ -139,6 +143,7 @@
     <h2>🎁 استلم كود الخصم</h2>
     <input id="name" placeholder="اسمك">
     <input id="phone" placeholder="رقم الموبايل">
+    <div class="error" id="formError"></div>
     <button class="btn-primary" onclick="submitForm()">استلم الكود</button>
   </div>
 
@@ -151,7 +156,7 @@
 
 </div>
 
-<!-- ================= APP ================= -->
+<!-- ============ APP ============ -->
 <div id="app">
 
   <div class="logo">
@@ -162,10 +167,8 @@
 
   <audio id="player" controls autoplay></audio>
 
-  <div id="lengthBox">
-    <button class="app-btn secondary" onclick="setLength('short')">قصير</button>
-    <button class="app-btn primary" onclick="setLength('medium')">متوسط</button>
-  </div>
+  <button class="app-btn secondary" onclick="setLength('short')">قصير</button>
+  <button class="app-btn primary" onclick="setLength('medium')">متوسط</button>
 
   <button class="app-btn primary" onclick="playTravel()">🚗 دعاء السفر</button>
   <button id="backBtn" class="app-btn neutral" onclick="goBack()">↩️ رجوع</button>
@@ -175,9 +178,9 @@
 <script>
   /* ===== Welcome Logic ===== */
   if (!localStorage.getItem("welcomed")) {
-    document.getElementById("welcome").style.display = "flex";
+    welcome.style.display = "flex";
   } else {
-    document.getElementById("app").style.display = "block";
+    app.style.display = "block";
   }
 
   function showForm() {
@@ -192,10 +195,27 @@
   }
 
   function submitForm() {
-    if (!name.value || !phone.value) {
-      alert("اكتب الاسم ورقم الموبايل");
+    const nameVal = name.value.trim();
+    const phoneVal = phone.value.trim();
+    const errorBox = document.getElementById("formError");
+
+    errorBox.style.display = "none";
+
+    if (nameVal.length < 2) {
+      errorBox.innerText = "من فضلك اكتب اسم صحيح";
+      errorBox.style.display = "block";
       return;
     }
+
+    const phoneRegex = /^01[0-2,5][0-9]{8}$/;
+    if (!phoneRegex.test(phoneVal)) {
+      errorBox.innerText = "من فضلك اكتب رقم موبايل مصري صحيح";
+      errorBox.style.display = "block";
+      return;
+    }
+
+    console.log("Name:", nameVal, "Phone:", phoneVal);
+
     step2.style.display = "none";
     step3.style.display = "block";
   }
