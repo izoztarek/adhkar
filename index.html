@@ -106,23 +106,29 @@ const lengthBox = document.getElementById("lengthBox");
 
 let length = localStorage.getItem("length");
 
+/* ⚙️ زر الإعدادات */
 function toggleSettings(){
   lengthBox.style.display =
     lengthBox.style.display === "block" ? "none" : "block";
 }
 
+/* ⏱️ اختيار طول الذكر */
 function setLength(val){
   localStorage.setItem("length", val);
   length = val;
+  lengthBox.style.display = "none"; // 👈 إخفاء الخانة بعد الاختيار
   playAuto();
 }
 
+/* 🔊 تشغيل تلقائي */
 function playAuto(){
   if(!length){
     title.innerText = "اختر طول الذكر";
     lengthBox.style.display = "block";
     return;
   }
+
+  lengthBox.style.display = "none"; // 👈 تأكيد الإخفاء
 
   let src = "";
   if(hour >= 4 && hour < 17){
@@ -138,6 +144,7 @@ function playAuto(){
   player.play();
 }
 
+/* 🚗 دعاء السفر */
 function playTravel(){
   player.src = "travel.mp3";
   title.innerText = "دعاء السفر";
@@ -145,10 +152,12 @@ function playTravel(){
   player.play();
 }
 
+/* ↩️ رجوع */
 function goBack(){
   playAuto();
 }
 
+/* تشغيل أولي */
 playAuto();
 </script>
 
