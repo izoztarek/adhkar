@@ -28,14 +28,8 @@ body{
   align-items:center;
 }
 
-.logo img{
-  width:90px;
-}
-
-.settings{
-  font-size:22px;
-  cursor:pointer;
-}
+.logo img{width:90px}
+.settings{font-size:22px;cursor:pointer}
 
 .header{
   background:rgba(255,255,255,.92);
@@ -71,6 +65,31 @@ audio{
 
 #lengthBox{display:none}
 #backBtn{display:none}
+
+/* ===== Tracker ===== */
+.tracker{
+  max-width:420px;
+  margin:16px auto;
+  background:rgba(255,255,255,.92);
+  border-radius:16px;
+  padding:14px;
+}
+
+.progress-bar{
+  width:100%;
+  height:12px;
+  background:#e5e5e5;
+  border-radius:20px;
+  overflow:hidden;
+  margin:10px 0;
+}
+
+.progress{
+  height:100%;
+  width:0%;
+  background:#2C7BE5;
+  transition:.4s;
+}
 </style>
 </head>
 
@@ -95,6 +114,16 @@ audio{
   <button class="btn primary" onclick="playTravel()">🚗 دعاء السفر</button>
   <button id="backBtn" class="btn neutral" onclick="goBack()">↩️ رجوع</button>
 
+  <!-- 📊 Tracker -->
+  <div class="tracker">
+    <strong>📊 التزامك هذا الشهر</strong>
+    <div id="progressText">0 / 30 يوم</div>
+    <div class="progress-bar">
+      <div id="progress" class="progress"></div>
+    </div>
+    <p id="motivation"></p>
+  </div>
+
 </div>
 
 <script>
@@ -106,7 +135,7 @@ const lengthBox = document.getElementById("lengthBox");
 
 let length = localStorage.getItem("length");
 
-/* ⚙️ زر الإعدادات */
+/* ⚙️ الإعدادات */
 function toggleSettings(){
   lengthBox.style.display =
     lengthBox.style.display === "block" ? "none" : "block";
@@ -116,11 +145,11 @@ function toggleSettings(){
 function setLength(val){
   localStorage.setItem("length", val);
   length = val;
-  lengthBox.style.display = "none"; // 👈 إخفاء الخانة بعد الاختيار
+  lengthBox.style.display = "none";
   playAuto();
 }
 
-/* 🔊 تشغيل تلقائي */
+/* 🔊 تشغيل الأذكار */
 function playAuto(){
   if(!length){
     title.innerText = "اختر طول الذكر";
@@ -128,7 +157,7 @@ function playAuto(){
     return;
   }
 
-  lengthBox.style.display = "none"; // 👈 تأكيد الإخفاء
+  lengthBox.style.display = "none";
 
   let src = "";
   if(hour >= 4 && hour < 17){
@@ -142,6 +171,7 @@ function playAuto(){
   backBtn.style.display = "none";
   player.src = src;
   player.play();
+  trackListening(); // 👈 تسجيل اليوم
 }
 
 /* 🚗 دعاء السفر */
@@ -157,7 +187,55 @@ function goBack(){
   playAuto();
 }
 
+/* ===== Tracker Logic ===== */
+function monthKey(){
+  const d=new Date();
+  return d.getFullYear()+"-"+(d.getMonth()+1);
+}
+function today(){
+  return new Date().getDate().toString();
+}
+
+function trackListening(){
+  let data = JSON.parse(localStorage.getItem("rafiqTracker"));
+  if(!data || data.month!==monthKey()){
+    data={month:monthKey(),days:[]};
+  }
+  if(!data.days.includes(today())){
+    data.days.push(today());
+    localStorage.setItem("rafiqTracker",JSON.stringify(data));
+  }
+  renderTracker(data.days.length);
+}
+
+function renderTracker(count){
+  const total=30;
+  const percent=Math.min((count/total)*100,100);
+
+  document.getElementById("progressText").innerText=
+    `${count} / ${total} يوم`;
+
+  document.getElementById("progress").style.width=percent+"%";
+
+  const left=total-count;
+  let msg="";
+
+  if(count<=5) msg="🌱 بداية جميلة، الذكر حياة للقلب";
+  else if(count<=15) msg=`💪 ما شاء الله، باقي ${left} يوم وتكمل شهر ذكر`;
+  else if(count<=25) msg="🕌 ثابت بإذن الله، الذكر عادة الصالحين";
+  else if(count<30) msg=`🏆 قربت توصل! باقي ${left} يوم`;
+  else msg="🌟 مبارك! أتممت شهرًا كاملًا من الذكر";
+
+  document.getElementById("motivation").innerText=msg;
+}
+
 /* تشغيل أولي */
+(function(){
+  const data=JSON.parse(localStorage.getItem("rafiqTracker"));
+  if(data && data.month===monthKey()){
+    renderTracker(data.days.length);
+  }
+})();
 playAuto();
 </script>
 
