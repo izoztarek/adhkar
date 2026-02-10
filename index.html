@@ -29,7 +29,6 @@ body{
 }
 
 .logo img{width:90px}
-.settings{font-size:22px;cursor:pointer}
 
 .header{
   background:rgba(255,255,255,.92);
@@ -62,11 +61,12 @@ audio{
 .primary{background:#2C7BE5}
 .secondary{background:#198754}
 .neutral{background:#6C757D}
+.locked{background:#bbb;color:#444}
 
-#lengthBox{display:none}
+#settingsBox{display:none}
 #backBtn{display:none}
 
-/* ===== Tracker ===== */
+/* Tracker */
 .tracker{
   max-width:420px;
   margin:16px auto;
@@ -99,22 +99,20 @@ audio{
 
   <div class="top-bar">
     <div class="logo"><img src="logo.png"></div>
-    <div class="settings" onclick="toggleSettings()">⚙️</div>
   </div>
 
   <div id="title" class="header">اختر طول الذكر</div>
 
   <audio id="player" controls autoplay></audio>
 
-  <div id="lengthBox">
-    <button class="btn secondary" onclick="setLength('short')">قصير</button>
-    <button class="btn primary" onclick="setLength('medium')">متوسط</button>
-  </div>
+  <button class="btn neutral" onclick="toggleSettings()">إعدادات الذكر</button>
+
+  <div id="settingsBox"></div>
 
   <button class="btn primary" onclick="playTravel()">🚗 دعاء السفر</button>
   <button id="backBtn" class="btn neutral" onclick="goBack()">↩️ رجوع</button>
 
-  <!-- 📊 Tracker -->
+  <!-- Tracker -->
   <div class="tracker">
     <strong>📊 التزامك هذا الشهر</strong>
     <div id="progressText">0 / 30 يوم</div>
@@ -127,67 +125,15 @@ audio{
 </div>
 
 <script>
-const hour = new Date().getHours();
 const player = document.getElementById("player");
 const title = document.getElementById("title");
+const settingsBox = document.getElementById("settingsBox");
 const backBtn = document.getElementById("backBtn");
-const lengthBox = document.getElementById("lengthBox");
 
 let length = localStorage.getItem("length");
+let reader = localStorage.getItem("reader") || "default";
 
-/* ⚙️ الإعدادات */
-function toggleSettings(){
-  lengthBox.style.display =
-    lengthBox.style.display === "block" ? "none" : "block";
-}
-
-/* ⏱️ اختيار طول الذكر */
-function setLength(val){
-  localStorage.setItem("length", val);
-  length = val;
-  lengthBox.style.display = "none";
-  playAuto();
-}
-
-/* 🔊 تشغيل الأذكار */
-function playAuto(){
-  if(!length){
-    title.innerText = "اختر طول الذكر";
-    lengthBox.style.display = "block";
-    return;
-  }
-
-  lengthBox.style.display = "none";
-
-  let src = "";
-  if(hour >= 4 && hour < 17){
-    src = `morning_${length}.mp3`;
-    title.innerText = "أذكار الصباح";
-  }else{
-    src = `evening_${length}.mp3`;
-    title.innerText = "أذكار المساء";
-  }
-
-  backBtn.style.display = "none";
-  player.src = src;
-  player.play();
-  trackListening(); // 👈 تسجيل اليوم
-}
-
-/* 🚗 دعاء السفر */
-function playTravel(){
-  player.src = "travel.mp3";
-  title.innerText = "دعاء السفر";
-  backBtn.style.display = "block";
-  player.play();
-}
-
-/* ↩️ رجوع */
-function goBack(){
-  playAuto();
-}
-
-/* ===== Tracker Logic ===== */
+/* ===== Tracker Helpers ===== */
 function monthKey(){
   const d=new Date();
   return d.getFullYear()+"-"+(d.getMonth()+1);
@@ -195,9 +141,14 @@ function monthKey(){
 function today(){
   return new Date().getDate().toString();
 }
+function isUnlocked(){
+  const data=JSON.parse(localStorage.getItem("rafiqTracker"));
+  return data && data.days.length>=30;
+}
 
+/* ===== Tracker Logic ===== */
 function trackListening(){
-  let data = JSON.parse(localStorage.getItem("rafiqTracker"));
+  let data=JSON.parse(localStorage.getItem("rafiqTracker"));
   if(!data || data.month!==monthKey()){
     data={month:monthKey(),days:[]};
   }
@@ -210,26 +161,119 @@ function trackListening(){
 
 function renderTracker(count){
   const total=30;
-  const percent=Math.min((count/total)*100,100);
-
   document.getElementById("progressText").innerText=
     `${count} / ${total} يوم`;
+  document.getElementById("progress").style.width=
+    Math.min((count/total)*100,100)+"%";
 
-  document.getElementById("progress").style.width=percent+"%";
-
-  const left=total-count;
   let msg="";
-
+  const left=total-count;
   if(count<=5) msg="🌱 بداية جميلة، الذكر حياة للقلب";
-  else if(count<=15) msg=`💪 ما شاء الله، باقي ${left} يوم وتكمل شهر ذكر`;
-  else if(count<=25) msg="🕌 ثابت بإذن الله، الذكر عادة الصالحين";
+  else if(count<=15) msg=`💪 باقي ${left} يوم وتكمل شهر ذكر`;
+  else if(count<=25) msg="🕌 ثابت بإذن الله";
   else if(count<30) msg=`🏆 قربت توصل! باقي ${left} يوم`;
-  else msg="🌟 مبارك! أتممت شهرًا كاملًا من الذكر";
+  else msg="🌟 تم فتح ميزات جديدة بسبب انتظامك";
 
   document.getElementById("motivation").innerText=msg;
 }
 
-/* تشغيل أولي */
+/* ===== Settings UI ===== */
+function renderSettings(){
+  const unlocked=isUnlocked();
+
+  settingsBox.innerHTML=`
+    <div class="tracker">
+      <strong>⏱️ طول الذكر</strong><br><br>
+
+      <button class="btn secondary" onclick="setLength('short')">قصير</button>
+      <button class="btn primary" onclick="setLength('medium')">متوسط</button>
+
+      <button class="btn ${unlocked?'primary':'locked'}"
+        ${unlocked?"onclick=\"setLength('long')\"":"disabled"}>
+        ${unlocked?"طويل":"🔒 طويل (30 يوم)"}
+      </button>
+
+      <button class="btn ${unlocked?'primary':'locked'}"
+        ${unlocked?"onclick=\"setLength('verylong')\"":"disabled"}>
+        ${unlocked?"طويل جدًا":"🔒 طويل جدًا (30 يوم)"}
+      </button>
+
+      <hr>
+
+      <strong>🕋 القارئ</strong><br><br>
+
+      <button class="btn primary" onclick="setReader('default')">
+        الافتراضي
+      </button>
+
+      <button class="btn ${unlocked?'secondary':'locked'}"
+        ${unlocked?"onclick=\"setReader('maher')\"":"disabled"}>
+        ${unlocked?"ماهر المعيقلي":"🔒 ماهر المعيقلي"}
+      </button>
+    </div>
+  `;
+}
+
+/* ===== Actions ===== */
+function toggleSettings(){
+  if(settingsBox.style.display==="block"){
+    settingsBox.style.display="none";
+  }else{
+    renderSettings();
+    settingsBox.style.display="block";
+  }
+}
+
+function setLength(val){
+  length=val;
+  localStorage.setItem("length",val);
+  settingsBox.style.display="none";
+  playAuto();
+}
+
+function setReader(val){
+  reader=val;
+  localStorage.setItem("reader",val);
+  settingsBox.style.display="none";
+  playAuto();
+}
+
+function playAuto(){
+  if(!length){
+    title.innerText="اختر طول الذكر";
+    toggleSettings();
+    return;
+  }
+
+  const hour=new Date().getHours();
+  let src="";
+
+  if(hour>=4 && hour<17){
+    src=`${reader}_morning_${length}.mp3`;
+    title.innerText="أذكار الصباح";
+  }else{
+    src=`${reader}_evening_${length}.mp3`;
+    title.innerText="أذكار المساء";
+  }
+
+  backBtn.style.display="none";
+  player.src=src;
+  player.play();
+  trackListening();
+}
+
+function playTravel(){
+  player.src="travel.mp3";
+  title.innerText="دعاء السفر";
+  backBtn.style.display="block";
+  player.play();
+}
+
+function goBack(){
+  playAuto();
+}
+
+/* Init */
 (function(){
   const data=JSON.parse(localStorage.getItem("rafiqTracker"));
   if(data && data.month===monthKey()){
