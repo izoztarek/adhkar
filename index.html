@@ -20,9 +20,9 @@ body{
 .app{
   min-height:100vh;
   padding:16px;
+  text-align:center;
 }
 
-/* Top bar */
 .top-bar{
   display:flex;
   justify-content:space-between;
@@ -30,116 +30,63 @@ body{
   margin-bottom:10px;
 }
 
-.logo img{width:75px}
+.logo img{
+  width:70px;
+}
 
 .settings-btn{
-  background:#000;
-  color:#fff;
-  border:none;
-  border-radius:10px;
-  padding:8px 12px;
   font-size:14px;
+  padding:6px 10px;
+  border:1px solid #111;
+  border-radius:10px;
   cursor:pointer;
+  background:#fff;
 }
 
-/* Header */
 .header{
-  margin:10px 0;
+  border:1px solid #111;
   padding:12px;
-  border:1px solid #000;
   border-radius:14px;
-  text-align:center;
-  font-size:19px;
+  font-size:20px;
   font-weight:700;
+  margin:10px 0;
 }
 
-/* Tracker */
-.tracker{
-  border:1px solid #000;
-  border-radius:14px;
-  padding:10px;
+.counter{
   font-size:13px;
   margin-bottom:10px;
+  color:#333;
 }
 
-.progress-bar{
+audio{
   width:100%;
-  height:6px;
-  background:#eee;
-  border-radius:20px;
-  overflow:hidden;
-  margin:6px 0;
-}
-
-.progress{
-  height:100%;
-  width:0%;
-  background:#000;
-}
-
-/* First choice */
-#firstChoice{
-  border:1px solid #000;
-  border-radius:16px;
-  padding:14px;
   max-width:420px;
-  margin:14px auto;
-  text-align:center;
+  margin:12px auto;
 }
 
-.choice-btn{
-  width:100%;
-  padding:14px;
-  margin:6px 0;
-  border:none;
-  border-radius:14px;
-  font-size:16px;
-  font-weight:600;
-  color:#fff;
-  cursor:pointer;
-}
-
-.short{background:#000}
-.medium{background:#444}
-
-/* Buttons */
 .btn{
   width:100%;
   max-width:420px;
   padding:14px;
   margin:6px auto;
-  border:none;
+  border:1px solid #111;
   border-radius:14px;
-  font-size:15px;
+  font-size:16px;
   font-weight:600;
+  background:#fff;
   cursor:pointer;
-  display:block;
 }
 
-.primary{background:#000;color:#fff}
-.secondary{background:#444;color:#fff}
-.neutral{background:#777;color:#fff}
-.locked{background:#ccc;color:#555}
-
-audio{
-  width:100%;
-  max-width:420px;
-  display:block;
-  margin:12px auto;
+.btn.black{
+  background:#111;
+  color:#fff;
 }
 
-/* Settings */
-#settingsBox{
+#settingsBox,
+#lengthBox,
+#backBtn{
   display:none;
-  border:1px solid #000;
-  border-radius:16px;
-  padding:14px;
-  max-width:420px;
-  margin:10px auto;
 }
-
-#backBtn{display:none}
-hr{margin:12px 0}
 </style>
 </head>
 
@@ -148,166 +95,125 @@ hr{margin:12px 0}
 <div class="app">
 
   <div class="top-bar">
-    <div class="logo"><img src="logo.png"></div>
-    <button class="settings-btn" onclick="toggleSettings()">إعدادات الذكر</button>
+    <div class="logo"><img src="logo.png" alt="Rafiq"></div>
+    <div class="settings-btn" onclick="toggleSettings()">⚙️ إعدادات الذكر</div>
   </div>
 
-  <!-- Tracker -->
-  <div class="tracker">
-    <strong>📊 انتظامك هذا الشهر</strong><br>
-    <span id="progressText">0 / 30 يوم</span>
-    <div class="progress-bar">
-      <div id="progress" class="progress"></div>
-    </div>
-    <div id="motivation"></div>
+  <div class="counter" id="counterText"></div>
+
+  <div id="title" class="header">اختر طول الذكر</div>
+
+  <audio id="player" controls></audio>
+
+  <!-- اختيار الطول (أول مرة فقط) -->
+  <div id="lengthBox">
+    <button class="btn" onclick="setLength('short')">قصير</button>
+    <button class="btn" onclick="setLength('medium')">متوسط</button>
   </div>
 
-  <div id="title" class="header">جاري التحميل…</div>
-
-  <!-- First time -->
-  <div id="firstChoice">
-    <strong>اختر طول الذكر</strong><br><br>
-    <button class="choice-btn short" onclick="setFirstLength('short')">قصير</button>
-    <button class="choice-btn medium" onclick="setFirstLength('medium')">متوسط</button>
+  <!-- إعدادات الذكر -->
+  <div id="settingsBox">
+    <button class="btn" onclick="setLength('short')">قصير</button>
+    <button class="btn" onclick="setLength('medium')">متوسط</button>
   </div>
 
-  <audio id="player" controls autoplay></audio>
-
-  <div id="settingsBox"></div>
-
-  <button class="btn primary" onclick="playTravel()">دعاء السفر</button>
-  <button id="backBtn" class="btn neutral" onclick="goBack()">رجوع</button>
+  <button class="btn black" onclick="playTravel()">🚗 دعاء السفر</button>
+  <button id="backBtn" class="btn" onclick="goBack()">↩️ رجوع</button>
 
 </div>
 
 <script>
-const player=document.getElementById("player");
-const title=document.getElementById("title");
-const firstChoice=document.getElementById("firstChoice");
-const settingsBox=document.getElementById("settingsBox");
-const backBtn=document.getElementById("backBtn");
-
-let length=localStorage.getItem("length");
-let reader=localStorage.getItem("reader")||"default";
-
-/* ===== Tracker (High accuracy) ===== */
-function currentMonth(){
-  const d=new Date();
-  return d.getFullYear()+"-"+(d.getMonth()+1);
+// تسجيل Service Worker (تشغيل بدون نت)
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js');
 }
 
-function updateTracker(){
-  let data=JSON.parse(localStorage.getItem("rafiqTracker"));
+const player = document.getElementById("player");
+const title = document.getElementById("title");
+const lengthBox = document.getElementById("lengthBox");
+const settingsBox = document.getElementById("settingsBox");
+const backBtn = document.getElementById("backBtn");
+const counterText = document.getElementById("counterText");
 
-  if(!data || data.month!==currentMonth()){
-    data={
-      month:currentMonth(),
-      days:0,
-      last:0
-    };
-  }
+let length = localStorage.getItem("length");
 
-  const now=Date.now();
-  const dayMs=24*60*60*1000;
+// ===== عداد الالتزام =====
+function updateCounter(){
+  const now = Date.now();
+  const last = localStorage.getItem("lastListen");
+  let days = parseInt(localStorage.getItem("days") || "0");
 
-  if(now-data.last>=dayMs){
-    data.days++;
-    data.last=now;
-    localStorage.setItem("rafiqTracker",JSON.stringify(data));
-  }
-
-  renderTracker(data.days);
-}
-
-function renderTracker(days){
-  const total=30;
-  document.getElementById("progressText").innerText=`${days} / ${total} يوم`;
-  document.getElementById("progress").style.width=
-    Math.min((days/total)*100,100)+"%";
-
-  let msg="🌱 بداية طيبة";
-  if(days>=10) msg="💪 استمر";
-  if(days>=20) msg="🏁 قربت تكمل";
-  if(days>=30) msg="🌟 منتظم هذا الشهر";
-
-  document.getElementById("motivation").innerText=msg;
-}
-
-/* ===== First choice ===== */
-function setFirstLength(val){
-  localStorage.setItem("length",val);
-  length=val;
-  firstChoice.style.display="none";
-  playAuto();
-}
-
-/* ===== Settings ===== */
-function toggleSettings(){
-  if(settingsBox.style.display==="block"){
-    settingsBox.style.display="none";
+  if(!last){
+    localStorage.setItem("lastListen", now);
+    localStorage.setItem("days", "1");
+    days = 1;
   }else{
-    renderSettings();
-    settingsBox.style.display="block";
+    const diff = now - parseInt(last);
+    if(diff >= 24 * 60 * 60 * 1000){
+      days++;
+      localStorage.setItem("days", days);
+      localStorage.setItem("lastListen", now);
+    }
   }
+
+  counterText.innerText = `التزامك هذا الشهر: ${days} يوم`;
 }
 
-function renderSettings(){
-  settingsBox.innerHTML=`
-    <strong>طول الذكر</strong><br><br>
-    <button class="btn primary" onclick="setLength('short')">قصير</button>
-    <button class="btn secondary" onclick="setLength('medium')">متوسط</button>
-  `;
+// ===== إعدادات =====
+function toggleSettings(){
+  settingsBox.style.display =
+    settingsBox.style.display === "block" ? "none" : "block";
 }
 
+// ===== اختيار الطول =====
 function setLength(val){
-  length=val;
-  localStorage.setItem("length",val);
-  settingsBox.style.display="none";
+  localStorage.setItem("length", val);
+  length = val;
+  lengthBox.style.display = "none";
+  settingsBox.style.display = "none";
   playAuto();
 }
 
-/* ===== Playback ===== */
+// ===== تشغيل تلقائي =====
 function playAuto(){
+  updateCounter();
+
   if(!length){
-    firstChoice.style.display="block";
-    title.innerText="اختر طول الذكر";
+    title.innerText = "اختر طول الذكر";
+    lengthBox.style.display = "block";
     return;
   }
 
-  firstChoice.style.display="none";
-  const hour=new Date().getHours();
-  let src="";
+  const hour = new Date().getHours();
+  let src = "";
 
-  if(hour>=4&&hour<17){
-    src=`${reader}_morning_${length}.mp3`;
-    title.innerText="أذكار الصباح";
+  if(hour >= 4 && hour < 17){
+    src = `morning_${length}.mp3`;
+    title.innerText = "أذكار الصباح";
   }else{
-    src=`${reader}_evening_${length}.mp3`;
-    title.innerText="أذكار المساء";
+    src = `evening_${length}.mp3`;
+    title.innerText = "أذكار المساء";
   }
 
-  backBtn.style.display="none";
-  player.src=src;
+  backBtn.style.display = "none";
+  player.src = src;
   player.play();
-  updateTracker();
 }
 
+// ===== دعاء السفر =====
 function playTravel(){
-  player.src="travel.mp3";
-  title.innerText="دعاء السفر";
-  backBtn.style.display="block";
+  player.src = "travel.mp3";
+  title.innerText = "دعاء السفر";
+  backBtn.style.display = "block";
   player.play();
 }
 
+// ===== رجوع =====
 function goBack(){
   playAuto();
 }
 
-/* Init */
-const saved=JSON.parse(localStorage.getItem("rafiqTracker"));
-if(saved&&saved.month===currentMonth()){
-  renderTracker(saved.days);
-}
+// تشغيل أولي
 playAuto();
 </script>
 
