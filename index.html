@@ -5,7 +5,7 @@
 <title>رفيق</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600&display=swap" rel="stylesheet">
 
 <style>
 *{box-sizing:border-box}
@@ -27,7 +27,7 @@ body{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  margin-bottom:10px;
+  margin-bottom:12px;
 }
 
 .logo img{
@@ -35,12 +35,35 @@ body{
 }
 
 .settings-btn{
-  font-size:14px;
-  padding:6px 10px;
+  font-size:13px;
+  padding:6px 12px;
   border:1px solid #111;
-  border-radius:10px;
-  cursor:pointer;
+  border-radius:12px;
   background:#fff;
+  cursor:pointer;
+}
+
+.counter-box{
+  border:1px solid #111;
+  border-radius:14px;
+  padding:10px;
+  margin-bottom:12px;
+  font-size:14px;
+}
+
+.progress{
+  height:6px;
+  background:#eee;
+  border-radius:6px;
+  margin-top:6px;
+  overflow:hidden;
+}
+
+.progress span{
+  display:block;
+  height:100%;
+  width:0%;
+  background:#111;
 }
 
 .header{
@@ -48,14 +71,7 @@ body{
   padding:12px;
   border-radius:14px;
   font-size:20px;
-  font-weight:700;
-  margin:10px 0;
-}
-
-.counter{
-  font-size:13px;
   margin-bottom:10px;
-  color:#333;
 }
 
 audio{
@@ -71,8 +87,7 @@ audio{
   margin:6px auto;
   border:1px solid #111;
   border-radius:14px;
-  font-size:16px;
-  font-weight:600;
+  font-size:15px;
   background:#fff;
   cursor:pointer;
 }
@@ -82,8 +97,8 @@ audio{
   color:#fff;
 }
 
-#settingsBox,
 #lengthBox,
+#settingsBox,
 #backBtn{
   display:none;
 }
@@ -95,11 +110,16 @@ audio{
 <div class="app">
 
   <div class="top-bar">
-    <div class="logo"><img src="logo.png" alt="Rafiq"></div>
-    <div class="settings-btn" onclick="toggleSettings()">⚙️ إعدادات الذكر</div>
+    <div class="logo"><img src="logo.png" alt="Rafiق"></div>
+    <div class="settings-btn" onclick="toggleSettings()">إعدادات الذكر</div>
   </div>
 
-  <div class="counter" id="counterText"></div>
+  <div class="counter-box">
+    <div id="counterText"></div>
+    <div class="progress">
+      <span id="progressBar"></span>
+    </div>
+  </div>
 
   <div id="title" class="header">اختر طول الذكر</div>
 
@@ -111,19 +131,19 @@ audio{
     <button class="btn" onclick="setLength('medium')">متوسط</button>
   </div>
 
-  <!-- إعدادات الذكر -->
+  <!-- إعدادات -->
   <div id="settingsBox">
     <button class="btn" onclick="setLength('short')">قصير</button>
     <button class="btn" onclick="setLength('medium')">متوسط</button>
   </div>
 
-  <button class="btn black" onclick="playTravel()">🚗 دعاء السفر</button>
-  <button id="backBtn" class="btn" onclick="goBack()">↩️ رجوع</button>
+  <button class="btn black" onclick="playTravel()">دعاء السفر</button>
+  <button id="backBtn" class="btn" onclick="goBack()">رجوع</button>
 
 </div>
 
 <script>
-// تسجيل Service Worker (تشغيل بدون نت)
+// Service Worker
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('service-worker.js');
 }
@@ -134,6 +154,7 @@ const lengthBox = document.getElementById("lengthBox");
 const settingsBox = document.getElementById("settingsBox");
 const backBtn = document.getElementById("backBtn");
 const counterText = document.getElementById("counterText");
+const progressBar = document.getElementById("progressBar");
 
 let length = localStorage.getItem("length");
 
@@ -144,9 +165,9 @@ function updateCounter(){
   let days = parseInt(localStorage.getItem("days") || "0");
 
   if(!last){
-    localStorage.setItem("lastListen", now);
-    localStorage.setItem("days", "1");
     days = 1;
+    localStorage.setItem("days", days);
+    localStorage.setItem("lastListen", now);
   }else{
     const diff = now - parseInt(last);
     if(diff >= 24 * 60 * 60 * 1000){
@@ -156,7 +177,10 @@ function updateCounter(){
     }
   }
 
-  counterText.innerText = `التزامك هذا الشهر: ${days} يوم`;
+  if(days > 30) days = 30;
+
+  counterText.innerText = `التزامك هذا الشهر: ${days} من 30`;
+  progressBar.style.width = `${(days/30)*100}%`;
 }
 
 // ===== إعدادات =====
@@ -213,7 +237,6 @@ function goBack(){
   playAuto();
 }
 
-// تشغيل أولي
 playAuto();
 </script>
 
