@@ -752,7 +752,6 @@ body {
 
 <div id="app">
 
-  <!-- Top Bar (shared) -->
   <div class="topbar" id="topbar">
     <a class="topbar-logo" href="#" onclick="return false;">
       رفيق<span class="dot"></span>
@@ -765,7 +764,6 @@ body {
     </button>
   </div>
 
-  <!-- ══════════════ ONBOARDING SCREEN ══════════════ -->
   <div class="screen" id="screen-onboarding" style="padding: 0;">
     <div class="onboard-wrap">
       <div class="brand-mark">
@@ -807,11 +805,9 @@ body {
     </div>
   </div>
 
-  <!-- ══════════════ HOME SCREEN ══════════════ -->
   <div class="screen screen-home" id="screen-home">
     <div class="scroll-content">
 
-      <!-- Hero -->
       <div class="hero-card" id="heroCard">
         <div class="hero-badge">
           <span class="pulse"></span>
@@ -833,7 +829,6 @@ body {
         </div>
       </div>
 
-      <!-- Player (visible when playing) -->
       <div class="player-wrap" id="playerWrap">
         <div class="player-card">
           <div class="player-meta">
@@ -875,7 +870,6 @@ body {
         </div>
       </div>
 
-      <!-- Milestone (conditionally shown) -->
       <div class="milestone" id="milestoneBanner" style="display:none">
         <div class="milestone-icon" id="milestoneIcon">🎖️</div>
         <div>
@@ -884,7 +878,6 @@ body {
         </div>
       </div>
 
-      <!-- Stats Row -->
       <div class="streak-row">
         <div class="stat-card">
           <div class="stat-num" id="statStreak">0</div>
@@ -896,7 +889,6 @@ body {
         </div>
       </div>
 
-      <!-- Monthly Calendar -->
       <div class="month-card">
         <div class="month-header">
           <div style="font-size:15px;font-weight:600;" id="monthName">يونيو</div>
@@ -905,7 +897,6 @@ body {
         <div class="month-dots" id="monthDots"></div>
       </div>
 
-      <!-- Quick Actions -->
       <div class="quick-grid">
         <div class="quick-card" onclick="playCustom('travel')">
           <div class="quick-icon">🚗</div>
@@ -941,12 +932,10 @@ body {
     </div>
   </div>
 
-  <!-- ══════════════ SETTINGS SCREEN ══════════════ -->
   <div class="screen" id="screen-settings">
     <div class="scroll-content">
       <div style="padding-top: 16px;">
 
-        <!-- Length setting -->
         <div class="settings-section">
           <div class="settings-title">طول الذكر</div>
           <div class="length-grid" id="settingsLengthGrid">
@@ -969,7 +958,6 @@ body {
           </div>
         </div>
 
-        <!-- Reciter -->
         <div class="settings-section">
           <div class="settings-title">القارئ</div>
           <div class="setting-row" onclick="showLocked()">
@@ -984,7 +972,6 @@ body {
           </div>
         </div>
 
-        <!-- Preferences -->
         <div class="settings-section">
           <div class="settings-title">التفضيلات</div>
 
@@ -1005,7 +992,6 @@ body {
           </div>
         </div>
 
-        <!-- Stats -->
         <div class="settings-section">
           <div class="settings-title">إحصائياتك</div>
           <div class="setting-row" style="cursor:default;">
@@ -1028,7 +1014,6 @@ body {
           </div>
         </div>
 
-        <!-- About -->
         <div class="settings-section">
           <div class="settings-title">عن رفيق</div>
           <div class="setting-row" style="cursor:default;">
@@ -1044,7 +1029,6 @@ body {
     </div>
   </div>
 
-  <!-- ══════════════ BOTTOM NAV ══════════════ -->
   <nav class="bottom-nav" id="bottomNav">
     <button class="nav-btn active" id="navHome" onclick="goTo('home')" aria-label="الرئيسية">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -1064,10 +1048,8 @@ body {
 
 </div>
 
-<!-- Toast -->
 <div class="toast" id="toast"></div>
 
-<!-- Hidden audio -->
 <audio id="audioEl" preload="none"></audio>
 
 <script>
@@ -1482,9 +1464,42 @@ audio.addEventListener('ended', () => {
   updateSettingsLengthUI();
 })();
 
-/* ── Service Worker ── */
+/* ── Production-Grade Service Worker Registration & Lifecycle Hook ── */
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
+  window.addEventListener('load', () => {
+    let refreshing = false;
+
+    // التقاط إشعار استلام السيرفس وركر الجديد للتحكم التام بالتطبيق
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (refreshing) return;
+      refreshing = true;
+      
+      // استخدام نظام الـ Toast المدمج في تطبيقك لإظهار رسالة التحديث السلسة
+      if (typeof showToast === 'function') {
+        showToast('تم تحديث رفيق إلى أحدث إصدار ✓');
+        // إعادة تحميل خفيفة لتبديل الواجهة والملفات الجديدة بسلاسة وثبات
+        setTimeout(() => window.location.reload(), 1500);
+      }
+    });
+
+    navigator.serviceWorker.register('sw.js')
+      .then(registration => {
+        console.log('SW Registered with scope:', registration.scope);
+
+        // فحص التحديثات تلقائياً عند عودة المستخدم للتطبيق (ممتازة مع نقرات الـ NFC)
+        window.addEventListener('focus', () => {
+          registration.update();
+        });
+
+        // فحص دوري في الخلفية كل ساعة للتأكد من أحدث الملفات
+        setInterval(() => {
+          registration.update();
+        }, 3600000);
+      })
+      .catch(error => {
+        console.error('Service Worker registration failed:', error);
+      });
+  });
 }
 </script>
 
